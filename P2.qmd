@@ -1,6 +1,6 @@
 ---
 title: "Project 2"
-author: "Your Name Here"
+author: "Brandy Carr"
 format: 
   html:
     self-contained: true
@@ -16,13 +16,17 @@ editor: source
 **0. Import the JHS data.**
 
 ```{r}
-
+JHS <- haven::read_sas("analysis1.sas7bdat")
+#DT::datatable(head(JHS, n=10), filter="top") # first 10 rows of data
 ```
 
 **1a. Model systolic blood pressure (*sbp*; mmHg) as a function of age (*age*; years), education (*HSgrad*; 0=no, 1=yes), and body mass index (*BMI*; kg/m<sup>2</sup>), and the following interactions: body mass index $\times$ age and body mass index $\times$ education. Remember to report the resulting model.**
 
 ```{r}
-
+library(tidyverse)
+JHS1 <- JHS %>% select(sbp, age, HSgrad, BMI) %>% na.omit()
+m1 <- glm(sbp ~ HSgrad + BMI + age + BMI * (age + HSgrad), data=JHS1, family="gaussian")
+summary(m1)
 ```
 
 **1b. Perform the appropriate hypothesis test to determine if the interaction between body mass index and age is significant. Test at the $\alpha=0.05$ level. Remember to typeset your results.**
