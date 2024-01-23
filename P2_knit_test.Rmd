@@ -1,0 +1,432 @@
+---
+title: "STA6232: Project 2"
+author: "Brandy Carr"
+date: "`r Sys.Date()`"
+output:
+  rmdformats::material:
+    thumbnails: false
+    gallery: true
+    fig_width: 5
+    fig_height: 3
+pkgdown:
+  as_is: true
+---
+
+<head>
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat">
+
+<style>
+
+body {
+  color: #3B3A3A;
+}
+
+.header-panel h4, h1.title {
+  color: #5A766D;
+}
+
+.header-panel {
+  background-color: #B3E2CD;
+}
+
+.pages h1 {
+  color: #3B3A3A;
+}
+
+.nav-tabs {
+  background-color: #EEEEEE;
+  font-size: 22px;
+}
+
+.pages .nav-tabs>li.active>a {
+  background-color: #F0EBDC !important;
+  color: #3B3A3A !important;
+  font-size: 22px;
+}
+
+.pages .nav-tabs>li>a:hover {
+  color: #A79425 !important;
+  font-size: 22px;
+}
+
+.nav-tabs>li>a {
+  color: #3B3A3A !important;
+  font-size: 22px;
+}
+
+.nav-tabs>li>a:hover {
+  color: #A79425 !important;
+  font-size: 22px;
+}
+
+.nav-tabs>li>a:focus {
+  color: #3B3A3A !important;
+  font-size: 22px;
+}
+
+code {
+    color: #1B7356;
+    background-color: #DCFFEF;
+}
+
+.menu ul li.active, .menu ul li.active>a {
+    background-color: #F0EBDC;
+    color: #3B3A3A;
+    font-size: 22px;
+}
+
+#toc .nav>li.active>a:focus {
+    background-color: #F0EBDC;
+    font-size: 22px;
+}
+
+#toc .nav>li.active>a:hover {
+    color: #A79425 !important;
+    background-color: #F0EBDC;
+    font-size: 22px;
+}
+
+#toc .nav>li>a:hover {
+    color: #A79425 !important;
+    font-size: 22px;
+}
+
+#toc .nav>li>a {
+    color: #3B3A3A;
+    font-size: 22px;
+}
+
+</style>
+
+</head>
+
+```{r setup, include=FALSE}
+#Packages
+  library(knitr)
+  library(rmdformats)
+  library(formatR)
+  library(tidyverse)
+  library(formattable)
+#Global options
+  knitr::opts_chunk$set(echo = T, cache = T, prompt = F, tidy = F, comment = NA, message = F, warning = F)
+```
+
+# 0
+
+
+### Import the JHS Data
+
+</br>
+
+```{r}
+JHS <- haven::read_sas("analysis1.sas7bdat")
+DT::datatable(head(JHS, n=10), filter="top") # first 10 rows of data
+```
+
+# 1
+
+## {.tabset}
+
+### A
+
+#### Model systolic blood pressure (*sbp*; mmHg) as a function of age (*age*; years), education (*HSgrad*; 0=no, 1=yes), and body mass index (*BMI*; kg/m<sup>2</sup>), and the following interactions: body mass index $\times$ age and body mass index $\times$ education. Remember to report the resulting model.
+
+</br>
+
+```{r}
+JHS1 <- JHS %>% select(sbp, age, HSgrad, BMI) %>% na.omit()
+m1 <- glm(sbp ~ HSgrad + BMI + age + BMI:age + BMI:HSgrad, data=JHS1, family="gaussian")
+round(m1$coefficients, 2)
+```
+
+</br>
+
+<font color="#1B7356"> *11 rows containing missing data were removed* </font>
+
+</br>
+
+<font color="#1B7356"> $\hat{sbp} = 74.75 - 2.77(HSgrad) + 0.89(BMI) + 0.87(age) - 0.01(BMI:age) + 0.06(HSgrad:BMI)$ </font>
+
+</br>
+
+### B
+
+#### Perform the appropriate hypothesis test to determine if the interaction between body mass index and age is significant. Test at the $\alpha=0.05$ level. Remember to typeset your results.
+
+</br>
+
+<!-- boxplot(JHS1$BMI ~ JHS1$HSgrad) -->
+<!-- plot(JHS1$age, JHS1$BMI) -->
+
+```{r}
+c1 <- data.frame(summary(m1)$coeff)
+names(c1) <- names(as_tibble(summary(m1)$coeff))
+formattable(format(round(c1["BMI:age",], 4), scientific=F),
+            align = "c", 
+            list("t value" = color_tile("#FEFEB0", "#FEFEB0"), "Pr(>|t|)" = color_tile("#FEFEB0", "#FEFEB0")))
+```
+
+</br>
+
+`Hypotheses:`
+
+<font color="#1B7356"> $H_{0}$ : $\beta_{BMI:age} = 0$ </font>
+
+<font color="#1B7356"> $H_{1}$ : $\beta_{BMI:age} \ne 0$ </font>
+
+</br>
+
+`Test Statistic:`  
+
+<font color="#1B7356"> $t_{0} = -3.77$ </font>
+
+</br>
+
+`P-Value:`  
+
+<font color="#1B7356"> $p < 0.001$ </font>
+
+</br>
+
+`Rejection Region:`  
+
+<font color="#1B7356"> Reject $H_{0}$ if $p < \alpha;$ $\alpha = 0.05$ </font>
+
+</br>
+
+`Conclusion:`  
+
+<font color="#1B7356"> Reject $H_{0}.$ </font>
+
+<font color="#1B7356"> There is sufficient evidence to suggest that the interaction between body mass index and age (**BMI:age**) significantly predicts systolic blood pressure (**sbp**). </font>
+
+</br>
+
+### C
+
+#### Perform the appropriate hypothesis test to determine if the interaction between body mass index and education is significant. Test at the $\alpha=0.05$ level. Remember to typeset your results.
+
+</br>
+
+```{r}
+formattable(format(round(c1["HSgrad:BMI",], 4), scientific=F),
+            align = "c", 
+            list("t value" = color_tile("#FEFEB0", "#FEFEB0"), "Pr(>|t|)" = color_tile("#FEFEB0", "#FEFEB0")))
+```
+
+</br>
+
+`Hypotheses:`
+
+<font color="#1B7356"> $H_{0}$ : $\beta_{HSgrad:BMI} = 0$ </font>
+
+<font color="#1B7356"> $H_{1}$ : $\beta_{HSgrad:BMI} \ne 0$ </font>
+
+</br>
+
+`Test Statistic:`  
+
+<font color="#1B7356"> $t_{0} = 0.4501$ </font>
+
+</br>
+
+`P-Value:`  
+
+<font color="#1B7356"> $p = 0.6524$ </font>
+
+</br>
+
+`Rejection Region:`  
+
+<font color="#1B7356"> Reject $H_{0}$ if $p < \alpha;$ $\alpha = 0.05$ </font>
+
+</br>
+
+`Conclusion:`  
+
+<font color="#1B7356"> Fail to reject $H_{0}.$ </font>
+
+<font color="#1B7356"> There is NOT sufficient evidence to suggest that the interaction between body mass index and education (**HSgrad:BMI**) significantly predicts systolic blood pressure (**sbp**). </font>
+
+</br>
+
+### D
+
+#### Create the following models (i.e., plug in the following values and algebraically simplify): (1) body mass index of 32, (2) body mass index of 27, and (3) body mass index of 25.  Remember to report the resulting models. This does not require R code - I am asking you to simplify the models to get rid of the interaction term
+
+</br>
+
+<font color="#1B7356"> $\begin{array}{lr} Term&Beta \phantom0 Estimate\\ (Intercept)&74.7497\\ HSgrad&-2.7729\\ BMI&0.8855\\ age&0.8696\\ BMI:age&-0.0135\\ HSgrad:BMI&0.0557 \end{array}$ </font>
+
+</br>
+
+<font color="#1B7356"> $\hat{sbp} = 74.7497 - 2.7729(x_{HSgrad}) + 0.8855(x_{BMI}) + 0.8696(x_{age}) - 0.0135(x_{BMI:age}) + 0.0557(x_{HSgrad:BMI})$ </font>
+
+</br>
+
+`BMI = 32`
+
+|   <font color="#1B7356"> $\hat{sbp} = 74.7497 - 2.7729(x_{HSgrad}) + 0.8855(32) + 0.8696(x_{age}) - 0.0135(32:x_{age}) + 0.0557(x_{HSgrad}:32)$ </font>
+
+|       <font color="#1B7356"> $\hat{sbp} = 103.0857 - 2.7729(x_{HSgrad}) + 0.8696(x_{age}) - 0.4320(x_{age}) + 1.7824(x_{HSgrad})$ </font>
+
+|           <font color="#1B7356"> $\hat{sbp} = 103.0857 - 0.9905(x_{HSgrad}) + 0.4376(x_{age})$ </font>
+
+</br>
+
+`BMI = 27`
+
+|   <font color="#1B7356"> $\hat{sbp} = 74.7497 - 2.7729(x_{HSgrad}) + 0.8855(27) + 0.8696(x_{age}) - 0.0135(27:x_{age}) + 0.0557(x_{HSgrad}:27)$ </font>
+
+|       <font color="#1B7356"> $\hat{sbp} = 98.6582 - 2.7729(x_{HSgrad}) + 0.8696(x_{age}) - 0.3645(x_{age}) + 1.5039(x_{HSgrad})$ </font>
+
+|           <font color="#1B7356"> $\hat{sbp} = 98.6582 - 1.2690(x_{HSgrad}) + 0.5051(x_{age})$ </font>
+
+</br>
+
+`BMI = 25`
+
+|   <font color="#1B7356"> $\hat{sbp} = 74.7497 - 2.7729(x_{HSgrad}) + 0.8855(25) + 0.8696(x_{age}) - 0.0135(25:x_{age}) + 0.0557(x_{HSgrad}:25)$ </font>
+
+|       <font color="#1B7356"> $\hat{sbp} = 96.8872 - 2.7729(x_{HSgrad}) + 0.8696(x_{age}) - 0.3375(x_{age}) + 1.3925(x_{HSgrad})$ </font>
+
+|           <font color="#1B7356"> $\hat{sbp} = 96.8872 - 1.3804(x_{HSgrad}) + 0.5321(x_{age})$ </font>
+
+</br>
+
+### E
+
+#### Provide brief interpretations for the slopes of the predictors for one of the models in 1d (your choice, but make sure you specify which model you are interpreting).
+
+</br>
+
+`BMI = 32`
+
+<font color="#1B7356"> $\hat{sbp} = 98.6582 - 1.2690(x_{HSgrad}) + 0.5051(x_{age})$ </font>
+
+</br>
+
+<font color="#1B7356"> When looking at participants with a BMI of 32: </font>
+
+- <font color="#1B7356"> For those who graduated high school, systolic blood pressure is $1.2690 \phantom0 mmHg$ lower than those who did not. </font>
+
+- <font color="#1B7356"> For every $1 \phantom0 year$ increase in age, systolic blood pressure increases by $0.5051 \phantom0 mmHg$. </font>
+
+</br>
+
+### F
+
+#### Construct an appropriate data visualization to help with explaining the model results. Systolic blood pressure should be on the *y*-axis, age should be on the *x*-axis, and use the regression lines constructed in 1d.
+
+</br>
+
+```{r}
+#| eval: false
+JHS1 <- JHS1 %>% 
+  mutate(yhat_BMI32 = 103.0857 - 0.9905*HSgrad + 0.4376*age,
+         yhat_BMI27 = 98.6582 - 1.2690*HSgrad + 0.5051*age,
+         yhat_BMI25 = 96.8872 - 1.3804*HSgrad + 0.5321*age)
+
+JHS1$HSgrad2 <- factor(JHS1$HSgrad, 
+                       levels = c(0, 1), 
+                       labels = c("Did NOT Graduate High School", "Graduated High School"))
+
+JHS1 %>% 
+  ggplot(aes(x = age, group = HSgrad2)) +
+  geom_point(aes(y = sbp, shape = HSgrad2, fill = HSgrad2, color = HSgrad2), size = 0.5, alpha = 0.45) +
+  scale_shape_manual(values = c(24, 21)) +
+  scale_fill_manual(values = c("cornsilk3", "cornsilk3")) +
+  scale_color_manual(values = c("cornsilk4", "cornsilk4")) +
+  geom_line(aes(y = yhat_BMI25), color = "darkorange", linewidth = 0.7, linetype = 1) +
+  geom_line(aes(y = yhat_BMI27), color = "darkorchid1", linewidth = 0.7, linetype = 1) +
+  geom_line(aes(y = yhat_BMI32), color = "turquoise3", linewidth = 0.7, linetype = 1) +
+  labs(x = "Age", y = "Systolic Blood Pressure") +
+  facet_wrap(facets = "HSgrad2") +
+  ylim(105, 145) +
+  theme_bw(base_size = 5.5) +
+  theme(title = element_text(face="bold"), legend.position = "none")
+```
+
+</br>
+
+|               <font color="#00C5CD" size="4"> [BMI = 32]  ➜ $\phantom0 \hat{sbp} = 103.0857 - 0.9905(x_{HSgrad}) + 0.4376(x_{age})$ </font>
+
+|               <font color="#FF8C00" size="4"> [BMI = 27]  ➜ $\phantom0 \hat{sbp} = 98.6582 - 1.2690(x_{HSgrad}) + 0.5051(x_{age})$ </font>
+
+|               <font color="#BF3EFF" size="4"> [BMI = 25]  ➜ $\phantom0 \hat{sbp} = 96.8872 - 1.3804(x_{HSgrad}) + 0.5321(x_{age})$ </font>
+
+</br>
+
+```{r}
+#| echo: false
+#| fig-align: left
+#| fig-dpi: 300
+#| out-width: 100%
+#| fig-asp: 0.6
+JHS1 <- JHS1 %>% 
+  mutate(yhat_BMI32 = 103.0857 - 0.9905*HSgrad + 0.4376*age,
+         yhat_BMI27 = 98.6582 - 1.2690*HSgrad + 0.5051*age,
+         yhat_BMI25 = 96.8872 - 1.3804*HSgrad + 0.5321*age)
+
+JHS1$HSgrad2 <- factor(JHS1$HSgrad, 
+                       levels = c(0, 1), 
+                       labels = c("Did NOT Graduate High School", "Graduated High School"))
+
+JHS1 %>% 
+  ggplot(aes(x = age, group = HSgrad2)) +
+  geom_point(aes(y = sbp, shape = HSgrad2, fill = HSgrad2, color = HSgrad2), size = 0.8, alpha = 0.5) +
+  scale_shape_manual(values = c(24, 21)) +
+  scale_fill_manual(values = c("cornsilk2", "cornsilk2")) +
+  scale_color_manual(values = c("cornsilk4", "cornsilk4")) +
+  geom_line(aes(y = yhat_BMI25), color = "darkorange", linewidth = 0.8, linetype = 1) +
+  geom_line(aes(y = yhat_BMI27), color = "darkorchid1", linewidth = 0.8, linetype = 1) +
+  geom_line(aes(y = yhat_BMI32), color = "turquoise3", linewidth = 0.8, linetype = 1) +
+  labs(x = "Age", y = "Systolic Blood Pressure") +
+  facet_wrap(facets = "HSgrad2") +
+  ylim(105, 145) +
+  theme_bw(base_size = 5.5) +
+  theme(title = element_text(face="bold"), legend.position = "none")
+```
+
+</br>
+
+### G
+
+#### Graphically assess the assumptions implied by used the normal distribution. Remember to draw your overall conclusion with appropriate written justification.
+
+# 2
+
+## {.tabset}
+
+### A
+
+#### QA
+
+</br>
+
+```{r}
+
+```
+
+</br>
+
+<font color="#1B7356"> txt </font>
+
+</br>
+
+### B
+
+#### QB
+
+</br>
+
+```{r}
+
+```
+
+</br>
+
+<font color="#1B7356"> txt </font>
+
+</br>
