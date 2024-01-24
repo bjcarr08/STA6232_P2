@@ -4,10 +4,11 @@ author: "Brandy Carr"
 date: "`r Sys.Date()`"
 output:
   rmdformats::material:
+    self_contained: true
     thumbnails: false
+    lightbox: true
     gallery: true
-    fig_width: 5
-    fig_height: 3
+    highlight: highlight.theme
 pkgdown:
   as_is: true
 ---
@@ -334,13 +335,13 @@ JHS1$HSgrad2 <- factor(JHS1$HSgrad,
 
 JHS1 %>% 
   ggplot(aes(x = age, group = HSgrad2)) +
-  geom_point(aes(y = sbp, shape = HSgrad2, fill = HSgrad2, color = HSgrad2), size = 0.5, alpha = 0.45) +
+  geom_point(aes(y = sbp, shape = HSgrad2, fill = HSgrad2, color = HSgrad2), size = 0.5, alpha = 0.35) +
   scale_shape_manual(values = c(24, 21)) +
   scale_fill_manual(values = c("cornsilk3", "cornsilk3")) +
   scale_color_manual(values = c("cornsilk4", "cornsilk4")) +
-  geom_line(aes(y = yhat_BMI25), color = "darkorange", linewidth = 0.7, linetype = 1) +
-  geom_line(aes(y = yhat_BMI27), color = "darkorchid1", linewidth = 0.7, linetype = 1) +
-  geom_line(aes(y = yhat_BMI32), color = "turquoise3", linewidth = 0.7, linetype = 1) +
+  geom_line(aes(y = yhat_BMI25), color = "#40015A", linewidth = 0.5, linetype = 1) +
+  geom_line(aes(y = yhat_BMI27), color = "purple", linewidth = 0.6, linetype = 2) +
+  geom_line(aes(y = yhat_BMI32), color = "orchid2", linewidth = 0.6, linetype = 6) +
   labs(x = "Age", y = "Systolic Blood Pressure") +
   facet_wrap(facets = "HSgrad2") +
   ylim(105, 145) +
@@ -350,11 +351,11 @@ JHS1 %>%
 
 </br>
 
-|               <font color="#00C5CD" size="4"> [BMI = 32]  ➜ $\phantom0 \hat{sbp} = 103.0857 - 0.9905(x_{HSgrad}) + 0.4376(x_{age})$ </font>
+|               <font color="#EE7AE9" size="4"> [BMI = 32]  ➜ $\phantom0 \hat{sbp} = 103.0857 - 0.9905(x_{HSgrad}) + 0.4376(x_{age})$ </font>
 
-|               <font color="#FF8C00" size="4"> [BMI = 27]  ➜ $\phantom0 \hat{sbp} = 98.6582 - 1.2690(x_{HSgrad}) + 0.5051(x_{age})$ </font>
+|               <font color="#A020F0" size="4"> [BMI = 27]  ➜ $\phantom0 \hat{sbp} = 98.6582 - 1.2690(x_{HSgrad}) + 0.5051(x_{age})$ </font>
 
-|               <font color="#BF3EFF" size="4"> [BMI = 25]  ➜ $\phantom0 \hat{sbp} = 96.8872 - 1.3804(x_{HSgrad}) + 0.5321(x_{age})$ </font>
+|               <font color="#40015A" size="4"> [BMI = 25]  ➜ $\phantom0 \hat{sbp} = 96.8872 - 1.3804(x_{HSgrad}) + 0.5321(x_{age})$ </font>
 
 </br>
 
@@ -375,13 +376,17 @@ JHS1$HSgrad2 <- factor(JHS1$HSgrad,
 
 JHS1 %>% 
   ggplot(aes(x = age, group = HSgrad2)) +
-  geom_point(aes(y = sbp, shape = HSgrad2, fill = HSgrad2, color = HSgrad2), size = 0.8, alpha = 0.5) +
+  geom_point(aes(y = sbp, shape = HSgrad2, fill = HSgrad2, color = HSgrad2), size = 0.8, alpha = 0.35) +
   scale_shape_manual(values = c(24, 21)) +
   scale_fill_manual(values = c("cornsilk2", "cornsilk2")) +
   scale_color_manual(values = c("cornsilk4", "cornsilk4")) +
-  geom_line(aes(y = yhat_BMI25), color = "darkorange", linewidth = 0.8, linetype = 1) +
-  geom_line(aes(y = yhat_BMI27), color = "darkorchid1", linewidth = 0.8, linetype = 1) +
-  geom_line(aes(y = yhat_BMI32), color = "turquoise3", linewidth = 0.8, linetype = 1) +
+  #geom_line(aes(y = yhat_BMI25), color = "darkorange", linewidth = 0.7, linetype = 1) +
+  #geom_line(aes(y = yhat_BMI27), color = "darkorchid1", linewidth = 0.7, linetype = 1) +
+  #geom_line(aes(y = yhat_BMI32), color = "turquoise3", linewidth = 0.7, linetype = 1) +
+  geom_line(aes(y = yhat_BMI25), color = "#40015A", linewidth = 0.5, linetype = 1) +
+  geom_line(aes(y = yhat_BMI27), color = "purple", linewidth = 0.6, linetype = 2) +
+  geom_line(aes(y = yhat_BMI32), color = "orchid2", linewidth = 0.6, linetype = 6) +
+    # "darkmagenta" "purple1" "violet" "darkviolet" "magenta"
   labs(x = "Age", y = "Systolic Blood Pressure") +
   facet_wrap(facets = "HSgrad2") +
   ylim(105, 145) +
