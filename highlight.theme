@@ -19,7 +19,8 @@
     },
     "text-styles": {
         "Normal": {
-            "text-color": "#9C8C7B"
+            "text-color": "#9C8C7B",
+            "background-color": null
         },
         "Other": {
             "text-color": "#FA962D",
@@ -50,7 +51,7 @@
             "underline": false
         },
         "Function": {
-            "text-color": "#00BBA0",
+            "text-color": "#037968",
             "background-color": null,
             "bold": false,
             "italic": false,
